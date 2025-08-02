@@ -1,0 +1,11 @@
+#env file
+.env
+#uploads and output dir
+uploads/
+sync/
+#node_modules
+node_modules/
+#vscode settings
+.vscode/
+#any csv files
+*.csv

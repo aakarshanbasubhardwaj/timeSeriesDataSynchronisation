@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Time Series Data Synchronization</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: #ffffff;
+    font-size: 13px;           /* Slightly smaller than default */
+    line-height: 1.5;
+    /* Remove width/height 100vw/100vh for better scaling */
+    overflow-x: hidden;
+        }
+
+        .dm-sans {
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+            min-height: 0;
+        }
+
+        .sidebar {
+            width: 56px;
+            height: 100%;
+            background-color: #fff;
+            border-right: 1px solid #E2E8F0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0.7rem 0;
+            gap: 1rem;
+            box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25) inset;
+        }
+
+        .sidebar-icons {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+           
+        }
+
+        .sidebar-icon {
+            width: 2rem;
+            height: 2rem;
+            background-color: #F8FAFC;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-icon:last-child {
+            background-color: transparent;
+        }
+
+        .sidebar-icon.selected {
+        background-color: #e0e0ff;
+        box-shadow: 0 0 0 2px #7a7cff;
+        }
+        .main-content,
+        .placeholder-content {
+        width: 100%;
+        height: 100%;
+    }
+    .placeholder-content {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: #7a7cff;
+        font-family: 'DM Sans', sans-serif;
+        min-height: 400px;
+        text-align: center;
+    }
+    .placeholder-content.visible {
+        display: flex;
+    }
+    .main-content.hidden {
+        display: none !important;
+    }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            height: 54px;
+            background-color: #fff;
+            border-bottom: 1px solid rgba(255,249,249,0);
+            padding: 0.7rem 1rem;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
+        }
+
+        .header h1 {
+            font-size: 16px;
+            font-weight: 800;
+            color: #1e293b;
+            line-height: 20px;
+            letter-spacing: -0.39px;
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 0.7rem;
+        }
+
+        .content-container {
+            max-width: 1835px;
+            margin: 0 auto;
+        }
+
+        .upload-section {
+            margin-bottom: 1rem;
+        }
+
+        .upload-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #222;
+            margin-bottom: 1rem;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .upload-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .drop-zone {
+            height: 215px;
+            border: 2px dashed #3276E8;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+            background-color: #E8ECFF;
+            position: relative;
+        }
+
+        .drop-zone.dragging {
+            background-color: #D1D9FF;
+        }
+
+        .drop-zone input[type="file"] {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .drop-zone p {
+            font-size: 16px;
+            color: #222;
+            opacity: 0.5;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .file-tags {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .file-tag {
+            padding: 0.25rem 0.5rem;
+            background-color: rgba(34,34,34,0.1);
+            border-radius: 6px;
+            font-size: 12px;
+            color: #222;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .file-tag.outline {
+            background-color: transparent;
+            border: 1px solid rgba(34,34,34,0.1);
+        }
+
+        .upload-progress {
+            display: none;
+            margin-bottom: 2rem;
+        }
+
+        .upload-progress.visible {
+            display: block;
+        }
+
+        .progress-card {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            background-color: #fff;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 731px;
+            box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25), 0 4px 4px 0 rgba(0, 0, 0, 0.25);
+        }
+
+        .progress-info {
+            flex: 1;
+        }
+
+        .progress-info h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: #222;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .progress-info p {
+            font-size: 14px;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .progress-info .blue-text {
+            color: #3276E8;
+        }
+
+        .progress-info .gray-text {
+            color: rgba(20,27,52,0.4);
+        }
+
+        .progress-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .progress-bar {
+            width: 160px;
+            height: 0.18rem;
+            background-color: rgba(49,67,98,0.1);
+            border-radius: 2px;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 0.25rem;
+            background-color: #3276E8;
+            border-radius: 2px;
+            transition: width 0.3s;
+            width: 0%;
+        }
+
+        .remove-btn {
+            opacity: 0.25;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 2px;
+        }
+
+        .charts-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+    .chart-container {
+            background-color: #fff;
+            border: 1px solid #CBD5E1;
+            border-radius: 24px;
+            padding: 1rem;
+            width: 100%;
+            min-height: 400px;
+            
+        }
+
+        .chart-area {
+            position: relative;
+            height: 300px;
+            margin-bottom: 1rem;
+        }
+
+        .file-visualization {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            border: 2px dashed #E2E8F0;
+            border-radius: 12px;
+            background-color: #F8FAFC;
+            color: #64748B;
+            font-size: 14px;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .empty-chart {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            border: 1px solid #E2E8F0;
+            border-radius: 12px;
+            background-color: #F8FAFC;
+            color: #64748B;
+            font-size: 14px;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .chart-grid {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+        }
+
+        .grid-lines {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+        }
+
+        .grid-line {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .grid-label {
+            font-size: 12px;
+            color: #475569;
+            width: 2.25rem;
+            text-align: right;
+        }
+
+        .grid-line-stroke {
+            flex: 1;
+            height: 1px;
+            background-color: #CBD5E1;
+        }
+
+        .chart-svg {
+            position: absolute;
+            left: 2rem;
+            top: 1rem;
+            width: calc(100% - 2rem);
+            height: 250px;
+        }
+
+        .chart-tooltip {
+            position: absolute;
+            background-color: #1E293B;
+            color: white;
+            padding: 0.5rem 0.75rem;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 800;
+            display: none;
+        }
+
+        .chart-tooltip.visible {
+            display: block;
+        }
+
+        .tooltip-arrow {
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .x-axis {
+            position: absolute;
+            bottom: 0;
+            left: 2rem;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #475569;
+        }
+
+        .chart-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            
+        }
+
+        .chart-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0;        /* add this if not present */
+    padding-bottom: 0;
+        }
+
+ .chart-title-btn {
+            padding: 0.4rem 1.2rem;
+       
+        transition: background 0.2s, color 0.2s;
+            border: 1px solid #CBD5E1;
+            border-radius: 9999px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #475569;
+            background: #F1F5F9;
+            white-space: nowrap;
+        }
+
+
+        .chart-badges {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .badge-green {
+            background-color: #F0FDF4;
+            color: #22C55E;
+        }
+
+        .badge-gray {
+            background-color: #F8FAFC;
+            color: #475569;
+        }
+
+        .sync-btn {
+            background-color: #7a7cff;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 9999px;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.75px;
+            text-transform: uppercase;
+            border: none;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .sync-btn.disabled {
+    filter: blur(1px);
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .content-container {
+                max-width: 100%;
+                padding: 0 1rem;
+            }
+
+            .header h1 {
+                font-size: 24px;
+                line-height: 32px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                flex-direction: row;
+                justify-content: center;
+                padding: 1rem;
+                gap: 1rem;
+            }
+
+            .main-content {
+                width: 100%;
+            }
+
+            .header {
+                height: auto;
+                min-height: 80px;
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 18px;
+                line-height: 24px;
+                text-align: center;
+            }
+
+            .content-area {
+                padding: 1rem;
+            }
+
+            .charts-section {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .chart-container {
+                min-height: 250px;
+            }
+
+            .progress-bar {
+                width: 120px;
+            }
+
+            .drop-zone {
+                height: 180px;
+            }
+
+            .file-tags {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .sidebar {
+                padding: 0.5rem;
+                gap: 0.5rem;
+            }
+
+            .sidebar-icon {
+                width: 2.5rem;
+                height: 2.5rem;
+            }
+
+            .header {
+                padding: 0.75rem;
+            }
+
+            .header h1 {
+                font-size: 16px;
+                line-height: 20px;
+            }
+
+            .content-area {
+                padding: 0.75rem;
+            }
+
+            .chart-container {
+                padding: 1rem;
+                min-height: 220px;
+            }
+
+            .progress-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+
+            .progress-controls {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .progress-bar {
+                width: 200px;
+            }
+
+            .chart-footer {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+
+            .chart-controls {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .drop-zone {
+                height: 150px;
+                padding: 1rem;
+            }
+
+            .drop-zone p {
+                font-size: 14px;
+                text-align: center;
+            }
+        }
+
+        @media (min-width: 1400px) {
+            .charts-section {
+                gap: 3rem;
+            }
+
+            .chart-container {
+                min-height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+   <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-icons">
+                <div class="sidebar-icon selected" id="sidebarIcon1">
+                    <!-- ...icon SVG... -->
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 1.92139C12.4848 1.92139 12.9501 2.11382 13.293 2.45654L20.793 9.95654C20.9633 10.1259 21.0985 10.3274 21.1904 10.5493C21.2823 10.7712 21.3288 11.0094 21.3281 11.2495V20.2505C21.328 20.5361 21.2146 20.8101 21.0127 21.0122C20.8105 21.2144 20.5359 21.3286 20.25 21.3286H3.75C3.46407 21.3286 3.18949 21.2144 2.9873 21.0122C2.78539 20.8101 2.67199 20.5361 2.67188 20.2505V11.2495C2.67116 11.0094 2.71769 10.7712 2.80957 10.5493C2.90148 10.3274 3.03669 10.1259 3.20703 9.95654H3.20801L10.708 2.45654C11.0508 2.11401 11.5154 1.92139 12 1.92139ZM19.1719 11.3853L12 4.21338L4.82812 11.3853V19.1724H19.1719V11.3853Z" fill="#475569" stroke="#475569" stroke-width="0.09375"/>
+                    </svg>
+                </div>
+                <div class="sidebar-icon" id="sidebarIcon2">
+                    <!-- ...icon SVG... -->
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M8.99976 19.9219H14.9998C15.2856 19.9219 15.5603 20.0352 15.7625 20.2373C15.9646 20.4395 16.0779 20.7141 16.0779 21C16.0779 21.2859 15.9646 21.5605 15.7625 21.7627C15.5603 21.9648 15.2856 22.0781 14.9998 22.0781H8.99976C8.71408 22.0781 8.44013 21.9646 8.23804 21.7627C8.03585 21.5605 7.92163 21.2859 7.92163 21C7.92163 20.7141 8.03585 20.4395 8.23804 20.2373C8.44013 20.0354 8.71408 19.9219 8.99976 19.9219ZM11.9998 1.92188C14.0758 1.92188 16.0669 2.74687 17.5349 4.21484C19.003 5.6829 19.8279 7.67385 19.8279 9.75C19.8279 12.1517 20.2614 14.1696 21.0808 15.5791C21.242 15.8578 21.3265 16.1742 21.3269 16.4961C21.3272 16.8181 21.2425 17.135 21.0818 17.4141C20.9231 17.6932 20.6928 17.9253 20.4148 18.0859C20.137 18.2464 19.8215 18.33 19.5007 18.3281H4.49976C4.17822 18.3306 3.86131 18.2476 3.58276 18.0869C3.30431 17.9263 3.07365 17.6935 2.91479 17.4141C2.75493 17.1346 2.6715 16.818 2.67261 16.4961C2.67373 16.1741 2.75972 15.8575 2.92163 15.5791C3.74094 14.1696 4.17163 12.1525 4.17163 9.75C4.17163 7.67392 4.99663 5.68289 6.4646 4.21484C7.93259 2.74685 9.92371 1.92195 11.9998 1.92188ZM11.9998 4.07812C10.4956 4.0782 9.05263 4.67564 7.98901 5.73926C6.92542 6.80293 6.32788 8.24579 6.32788 9.75C6.32788 12.2896 5.90837 14.4253 5.08276 16.1045L5.04956 16.1719H18.95L18.9167 16.1045C18.0911 14.4253 17.6716 12.2887 17.6716 9.75C17.6716 8.24573 17.0742 6.80294 16.0105 5.73926C14.9468 4.67566 13.504 4.07812 11.9998 4.07812Z" fill="#475569" stroke="#475569" stroke-width="0.09375"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content" id="mainContent">
+            <!-- Header -->
+            <div class="header">
+                <h1> A Sliding Window Dynamic Time Warping-Based Approach for Time Series Data Synchronization </h1>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <div class="content-container">
+                    <!-- File Upload Section -->
+                    <div class="upload-section">
+                        <h2 class="upload-title">Upload file</h2>
+                        <div class="upload-container">
+                            <div class="drop-zone" id="dropZone">
+                                <input type="file" accept=".xlsx,.csv" id="fileInput" multiple>
+                                <svg width="30" height="30" viewBox="0 0 31 31" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M16.7501 3H17.091C21.1675 3 23.2058 3 24.6213 3.99729C25.0268 4.28304 25.3869 4.62191 25.6905 5.00361C26.7501 6.33584 26.7501 8.2542 26.7501 12.0909V15.2727C26.7501 18.9767 26.7501 20.8287 26.164 22.3078C25.2216 24.6857 23.2287 26.5614 20.7022 27.4483C19.1306 28 17.1629 28 13.2274 28C10.9786 28 9.85414 28 8.95609 27.6848C7.51236 27.1779 6.37356 26.1061 5.83508 24.7473C5.50012 23.9021 5.50012 22.8438 5.50012 20.7273V15.5" stroke="#3276E8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M26.7502 15.5C26.7502 17.8012 24.8848 19.6667 22.5836 19.6667C21.7513 19.6667 20.7702 19.5208 19.961 19.7377C19.2421 19.9303 18.6805 20.4919 18.4879 21.2108C18.2711 22.02 18.4169 23.0011 18.4169 23.8333C18.4169 26.1345 16.5514 28 14.2502 28" stroke="#3276E8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M14.25 8L4.25 8M9.25 3V13" stroke="#3276E8" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                <p>Drag & Drop / Click to upload</p>
+                            </div>
+                            <div class="file-tags">
+                                <div class="file-tag">XLSX</div>
+                                <div class="file-tag">CSV</div>
+                                <div class="file-tag outline">&gt; 10 MB</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Upload Progress -->
+                    <div class="upload-progress" id="uploadProgress">
+                        <div class="progress-card">
+                            <div class="progress-info">
+                                <h3 id="fileName">subject01-surface.csv</h3>
+                                <p>
+                                    <span class="blue-text" id="progressPercent">0</span>
+                                    <span class="blue-text">% Uploading</span>
+                                    <span class="gray-text"> · </span>
+                                    <span class="blue-text" id="fileSize">0 MB</span>
+                                </p>
+                            </div>
+                            <div class="progress-controls">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="progressFill"></div>
+                                </div>
+                                <button class="remove-btn" id="removeBtn">
+                                    <svg width="8" height="8" viewBox="0 0 10 11" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M8.99915 9.5L1 1.5M1.00085 9.5L9 1.5" stroke="#141B34" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                    </svg>
+                                </button>
+                                <button class="sync-btn" id="syncBtn">Sync Now</button>
+                            </div>
+                            <button class="sync-btn" id="sendBtn" style="background: #10B981;">Send the File(s)</button>
+                        </div>
+                    </div>
+
+                    
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="placeholder-content" id="placeholderContent">
+            <div>
+                <h2>Placeholder Page</h2>
+                <p>This is the second page. You can put any content here.</p>
+            </div>
+        </div>
+
+    </div>
+
+     <!-- Add this in your HTML head or before your script -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- PapaParse (CSV parsing) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+
+<!-- SheetJS (XLSX parsing) -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1"></script>
+
+    <script>
+        // Application state
+        let appState = {
+            selectedFile: null,
+            uploadProgress: 0,
+            isDragging: false,
+            showTooltip1: false,
+            showTooltip2: false
+        };
+
+        // DOM elements
+      // DOM elements
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const uploadProgress = document.getElementById('uploadProgress');
+const fileName = document.getElementById('fileName');
+const progressPercent = document.getElementById('progressPercent');
+const progressFill = document.getElementById('progressFill');
+const fileSize = document.getElementById('fileSize');
+const removeBtn = document.getElementById('removeBtn');
+const syncBtn = document.getElementById('syncBtn');
+
+let uploadedFiles = [];
+
+// File upload handlers
+dropZone.addEventListener('click', (e) => {
+    if (e.target !== fileInput) {
+        fileInput.click();
+    }
+});
+
+dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('dragging');
+});
+
+dropZone.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('dragging');
+});
+
+dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('dragging');
+    const files = Array.from(e.dataTransfer.files)
+        .filter(file => file.type === 'text/csv' || file.name.endsWith('.xlsx') || file.name.endsWith('.csv'));
+    if (files.length > 0) {
+        handleMultipleFiles(files.slice(0, 2));
+    }
+});
+
+fileInput.addEventListener('change', (e) => {
+    const files = Array.from(e.target.files)
+        .filter(file => file.type === 'text/csv' || file.name.endsWith('.xlsx') || file.name.endsWith('.csv'));
+    if (files.length > 0) {
+        handleMultipleFiles(files.slice(0, 2));
+    }
+});
+
+// Remove files
+removeBtn.addEventListener('click', () => {
+    uploadedFiles = [];
+    uploadProgress.classList.remove('visible');
+    fileInput.value = '';
+    progressFill.style.width = '0%';
+    fileSize.textContent = '0 MB';
+    fileName.textContent = '';
+    syncBtn.classList.add('disabled');
+});
+
+// Format file size
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+// Handle multiple files
+async function handleMultipleFiles(files) {
+    uploadedFiles = files;
+    uploadProgress.classList.add('visible');
+    fileName.textContent = files.map(f => f.name).join(', ');
+    fileSize.textContent = files.map(f => formatFileSize(f.size)).join(' + ');
+    progressPercent.textContent = 0;
+    progressFill.style.width = '0%';
+    syncBtn.classList.add('disabled');
+
+    // Simulate upload progress
+    let progress = 0;
+    const interval = setInterval(() => {
+        progress += 10;
+        progressPercent.textContent = progress;
+        progressFill.style.width = progress + '%';
+        if (progress >= 100) {
+            clearInterval(interval);
+            syncBtn.classList.remove('disabled');
+        }
+    }, 100);
+}
+
+// Sync button sends files to endpoint
+syncBtn.addEventListener('click', async () => {
+    if (!uploadedFiles.length) return;
+    syncBtn.classList.add('disabled');
+    const formData = new FormData();
+    uploadedFiles.forEach((file, idx) => {
+        formData.append('file' + (idx + 1), file);
+    });
+
+    try {
+        await axios.post('YOUR_ENDPOINT_URL_HERE', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+            onUploadProgress: function(progressEvent) {
+                if (progressEvent.total) {
+                    const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                    progressPercent.textContent = percent;
+                    progressFill.style.width = percent + '%';
+                }
+            }
+        });
+        alert('Files uploaded successfully!');
+    } catch (error) {
+        alert('Upload failed: ' + (error.response?.data?.message || error.message));
+    }
+    syncBtn.classList.remove('disabled');
+});
+
+const sendBtn = document.getElementById('sendBtn');
+
+sendBtn.addEventListener('click', async () => {
+    if (!uploadedFiles.length) {
+        alert('No files to send!');
+        return;
+    }
+    sendBtn.disabled = true;
+    const formData = new FormData();
+    uploadedFiles.forEach((file, idx) => {
+        formData.append('file' + (idx + 1), file);
+    });
+
+    try {
+        const response = await axios.post('http://localhost:3333/syncFiles', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+            responseType: 'blob',
+            onUploadProgress: function(progressEvent) {
+                if (progressEvent.total) {
+                    const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                    progressPercent.textContent = percent;
+                    progressFill.style.width = percent + '%';
+                }
+            }
+        });
+        const blob = new Blob([response.data], { type: 'application/zip' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'sync_files.zip';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+        alert('Files synchronized and downloaded successfully!');
+    } catch (error) {
+        alert('Send failed: ' + (error.response?.data?.message || error.message));
+    }
+    sendBtn.disabled = false;
+});
+        // Parse CSV file and extract data
+function parseCSV(file) {
+    return new Promise((resolve, reject) => {
+        Papa.parse(file, {
+            header: true,
+            dynamicTyping: true,
+            skipEmptyLines: true, // helps avoid blank rows
+            complete: function(results) {
+                resolve(results.data);
+            },
+            error: function(error) {
+                reject(error);
+            }
+        });
+    });
+}
+        // Parse XLSX file and extract data
+        function parseXLSX(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const firstSheetName = workbook.SheetNames[0];
+                        const worksheet = workbook.Sheets[firstSheetName];
+                        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+                        resolve(jsonData);
+                    } catch (error) {
+                        reject(error);
+                    }
+                };
+                reader.onerror = function() {
+                    reject(new Error('Failed to read file'));
+                };
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        // Detect accelerometer data columns
+      
+      
+    </script>
+
+</body>
+</html>
