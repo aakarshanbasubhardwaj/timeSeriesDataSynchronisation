@@ -305,6 +305,7 @@
             position: relative;
             height: 400px;
             margin-bottom: 1rem;
+            /* Changed CSS: Removed centering properties */
             align-items: center;
             justify-content: center;
         }
@@ -347,6 +348,8 @@
             color: #64748B;
             font-size: 14px;
             font-family: 'DM Sans', sans-serif;
+            /* New CSS property to make it take up remaining space */
+            flex: 1;
         }
 
         .chart-grid {
@@ -747,7 +750,7 @@
 
                         <div class="chart-container">
                             <div class="chart-area">
-                                <div class="empty-chart">
+                                <div class="file-visualization empty-chart" id="synchronizedChartContainer">
                                     Synchronized data will appear here
                                 </div>
                             </div>
@@ -776,6 +779,7 @@
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.7.1/dist/jszip.min.js"></script>
     <script>
         // Application state
         let appState = {
@@ -805,19 +809,11 @@
         const mainContent = document.getElementById('mainContent');
         const placeholderContent = document.getElementById('placeholderContent');
         const fileVisualization = document.getElementById('fileVisualization');
-
-        // The idea : The `downloadBtn` works by separating the synchronization process from the actual file download, preventing an automatic download. 
-        // When you click the **"Sync Now"** button, the JavaScript code sends the uploaded files to a backend server. 
-        // The server processes the files and returns the synchronized data as a ZIP file. 
-        // The key change is that instead of triggering an immediate download, the code intercepts this response and stores the data as a `Blob` object in a variable called `synchronizedDataBlob`. 
-        // At this point, a loader is hidden and the **"Download Synchronized Data"** button becomes active
-        // Once the `synchronizedDataBlob` is ready, clicking the **"Download Synchronized Data"** button initiates the final step. 
-        // The script creates a temporary, invisible anchor (`<a>`) element in the browser's document, sets its `href` to a URL generated from the stored `Blob` data, and assigns a file name like "synchronized_data.zip" to its `download` attribute. 
-        // It then programmatically triggers a click on this hidden link. 
-        // This action prompts the browser to open the standard file download dialog, allowing the user to choose where to save the synchronized file. 
-        // This two-step process provides greater control over the user experience, ensuring the download only occurs when explicitly requested.
+        const synchronizedChartContainer = document.getElementById('synchronizedChartContainer');
 
         let synchronizedDataBlob = null;
+        let synchronizedCharts = [];
+        let chartInstances = [];
 
         function selectSidebar(index) {
             if (index === 1) {
@@ -836,8 +832,6 @@
         sidebarIcon1.addEventListener('click', () => selectSidebar(1));
         sidebarIcon2.addEventListener('click', () => selectSidebar(2));
         selectSidebar(1);
-
-        let chartInstances = [];
 
         async function handleMultipleFiles(files) {
             appState.uploadedFiles = files;
@@ -865,6 +859,11 @@
 
             chartInstances.forEach(chart => chart.destroy());
             chartInstances = [];
+            synchronizedCharts.forEach(chart => chart.destroy());
+            synchronizedCharts = [];
+            synchronizedChartContainer.innerHTML = 'Synchronized data will appear here';
+            synchronizedChartContainer.classList.add('empty-chart');
+
 
             fileVisualization.innerHTML = '';
             for (let i = 0; i < files.length; i++) {
@@ -964,6 +963,10 @@
             synchronizedDataBlob = null;
             chartInstances.forEach(chart => chart.destroy());
             chartInstances = [];
+            synchronizedCharts.forEach(chart => chart.destroy());
+            synchronizedCharts = [];
+            synchronizedChartContainer.innerHTML = 'Synchronized data will appear here';
+            synchronizedChartContainer.classList.add('empty-chart');
         });
 
         syncBtn.addEventListener('click', async () => {
@@ -994,6 +997,8 @@
                 downloadBtn.classList.remove('disabled');
                 syncBtn.classList.remove('hidden');
                 syncBtn.textContent = 'Resync';
+                
+                await renderSynchronizedCharts(synchronizedDataBlob);
 
             } catch (error) {
                 console.error('Synchronization failed:', error);
@@ -1021,8 +1026,6 @@
             }
         });
         
-        let currentChart = null;
-
         function parseCSV(file) {
             return new Promise((resolve, reject) => {
                 Papa.parse(file, {
@@ -1083,7 +1086,7 @@
             };
         }
 
-        function createAccelerometerChart(data, canvasId) {
+        function createAccelerometerChart(data, canvasId, title = '3D Accelerometer Data') {
             const columns = detectAccelerometerColumns(data);
 
             if (!columns || !columns.x || !columns.y || !columns.z) {
@@ -1180,7 +1183,7 @@
                         },
                         title: {
                             display: true,
-                            text: `3D Accelerometer Data (${chartData.length} samples)`
+                            text: `${title} (${chartData.length} samples)`
                         }
                     }
                 }
@@ -1228,7 +1231,7 @@
                 const canvas = document.createElement('canvas');
                 canvas.id = 'accelerometerChart';
                 fileVisualization.appendChild(canvas);
-                
+
                 createAccelerometerChart(data, 'accelerometerChart');
 
             } catch (error) {
@@ -1242,6 +1245,75 @@
                 `;
             }
         }
+        
+        async function renderSynchronizedCharts(zipBlob) {
+            synchronizedChartContainer.innerHTML = `
+                <div id="visualizationPlaceholder">
+                    <div style="margin-bottom: 1rem;">
+                        <div style="width: 32px; height: 32px; border: 3px solid #E2E8F0; border-top: 3px solid #3276E8; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+                    </div>
+                    <div style="font-weight: 600; margin-bottom: 0.5rem;">Unzipping synchronized data...</div>
+                </div>
+            `;
+
+            synchronizedCharts.forEach(chart => chart.destroy());
+            synchronizedCharts = [];
+
+            try {
+                const zip = new JSZip();
+                const unzipped = await zip.loadAsync(zipBlob);
+                
+                synchronizedChartContainer.classList.remove('empty-chart');
+                synchronizedChartContainer.innerHTML = '';
+                synchronizedChartContainer.style.display = 'flex';
+                synchronizedChartContainer.style.flexDirection = 'column';
+                synchronizedChartContainer.style.gap = '2rem';
+                synchronizedChartContainer.style.height = '100%';
+                synchronizedChartContainer.style.overflowY = 'auto';
+
+
+                const fileEntries = Object.keys(unzipped.files).filter(filename => !unzipped.files[filename].dir);
+                
+                for(let i = 0; i < fileEntries.length; i++) {
+                    const filename = fileEntries[i];
+                    const fileContent = await unzipped.files[filename].async("blob");
+                    const file = new File([fileContent], filename);
+                    
+                    let data;
+                    if (filename.endsWith('.csv')) {
+                        data = await parseCSV(file);
+                    } else if (filename.endsWith('.xlsx')) {
+                        data = await parseXLSX(file);
+                    }
+
+                    const chartDiv = document.createElement('div');
+                    chartDiv.innerHTML = `
+                        <div style="font-weight:600;margin-bottom:0.5rem; text-align: center;">${filename}</div>
+                        <div style="min-height:220px;">
+                            <canvas id="synchronizedChart${i}" style="height:180px;"></canvas>
+                        </div>
+                    `;
+                    synchronizedChartContainer.appendChild(chartDiv);
+                    
+                    const chartInstance = createAccelerometerChart(data, `synchronizedChart${i}`, `Synchronized Data - ${filename}`);
+                    if (chartInstance) {
+                        synchronizedCharts.push(chartInstance);
+                    }
+                }
+
+            } catch (error) {
+                console.error("Error unzipping or plotting synchronized data:", error);
+                synchronizedChartContainer.innerHTML = `
+                    <div id="visualizationPlaceholder" style="padding: 2rem;">
+                        <div style="color: #EF4444; margin-bottom: 1rem;">❌</div>
+                        <div style="font-weight: 600; margin-bottom: 0.5rem;">Error processing synchronized data</div>
+                        <div style="font-size: 12px; opacity: 0.7;">${error.message}</div>
+                    </div>
+                `;
+                synchronizedChartContainer.classList.add('empty-chart');
+            }
+        }
+
     </script>
 </body>
 </html>
