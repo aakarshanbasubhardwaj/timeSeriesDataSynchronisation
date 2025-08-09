@@ -15,6 +15,10 @@ app.use(cors());
 
 app.use(express.json()); 
 
+if (!fs.existsSync('uploads')) {
+  fs.mkdirSync('uploads', { recursive: true });
+}
+
 // test route
 app.get("/test", (req, res) => {
   res.status(200).json({ message: "test successful" });
@@ -49,7 +53,6 @@ app.post('/syncFiles', upload.fields([
 
   const file1Path = req.files.file1[0].path;
   const file2Path = req.files.file2[0].path;
-  let medianOffset = 0
 
   execFile('python3', ['backend.py', file1Path, file2Path], (error, stdout, stderr) => {
     if (error) {
@@ -62,7 +65,6 @@ app.post('/syncFiles', upload.fields([
       [file1Path, file2Path].forEach(file => {
         fs.unlink(file, () => {});
       });
-      medianOffset = stdout.trim();
     }
 
     if (!fs.existsSync('sync')) {
@@ -103,7 +105,6 @@ app.post('/syncFiles', upload.fields([
   
     archive.finalize();
   
-    // return res.status(200).json({ message: "File sync successful", medianOffset});
   });
 });
 

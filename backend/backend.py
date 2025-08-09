@@ -1,11 +1,8 @@
 import os
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-from scipy.spatial.distance import euclidean
 from tqdm import tqdm
 import csv
-import time 
 from dtaidistance import dtw
 from concurrent.futures import ProcessPoolExecutor, as_completed
 import sys

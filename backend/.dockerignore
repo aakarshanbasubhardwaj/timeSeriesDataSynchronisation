@@ -1,0 +1,6 @@
+.env
+Dockerfile.backend
+sync/
+uploads/
+.dockerignore
+node_modules/
