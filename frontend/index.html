@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Time Series Data Synchronization</title>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    
+
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -14,15 +14,14 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-    background-color: #ffffff;
-    font-size: 13px;           /* Slightly smaller than default */
-    line-height: 1.5;
-    /* Remove width/height 100vw/100vh for better scaling */
-    overflow-x: hidden;
+            background-color: #ffffff;
+            font-size: 13px;
+            line-height: 1.5;
+            overflow-x: hidden;
         }
 
         .dm-sans {
@@ -52,7 +51,6 @@
             display: flex;
             flex-direction: column;
             gap: 1rem;
-           
         }
 
         .sidebar-icon {
@@ -70,30 +68,30 @@
         }
 
         .sidebar-icon.selected {
-        background-color: #e0e0ff;
-        box-shadow: 0 0 0 2px #7a7cff;
+            background-color: #e0e0ff;
+            box-shadow: 0 0 0 2px #7a7cff;
         }
         .main-content,
         .placeholder-content {
-        width: 100%;
-        height: 100%;
-    }
-    .placeholder-content {
-        display: none;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.5rem;
-        color: #7a7cff;
-        font-family: 'DM Sans', sans-serif;
-        min-height: 400px;
-        text-align: center;
-    }
-    .placeholder-content.visible {
-        display: flex;
-    }
-    .main-content.hidden {
-        display: none !important;
-    }
+            width: 100%;
+            height: 100%;
+        }
+        .placeholder-content {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #7a7cff;
+            font-family: 'DM Sans', sans-serif;
+            min-height: 400px;
+            text-align: center;
+        }
+        .placeholder-content.visible {
+            display: flex;
+        }
+        .main-content.hidden {
+            display: none !important;
+        }
 
         .main-content {
             flex: 1;
@@ -122,6 +120,7 @@
         .content-area {
             flex: 1;
             padding: 0.7rem;
+            overflow-y: auto;
         }
 
         .content-container {
@@ -285,37 +284,57 @@
         .charts-section {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 1rem;
+            gap: 2rem;
             margin-bottom: 1rem;
         }
 
-    .chart-container {
+        .chart-container {
             background-color: #fff;
             border: 1px solid #CBD5E1;
             border-radius: 24px;
             padding: 1rem;
             width: 100%;
-            min-height: 400px;
-            
+            min-height: 900px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            overflow: hidden;
         }
 
         .chart-area {
             position: relative;
-            height: 300px;
+            height: 400px;
             margin-bottom: 1rem;
+            /* Changed CSS: Removed centering properties */
+            align-items: center;
+            justify-content: center;
         }
 
         .file-visualization {
             display: flex;
-            align-items: center;
-            justify-content: center;
+            flex-direction: column;
+            align-items: stretch;
+            justify-content: flex-start;
+            gap: 2rem;
             height: 100%;
+            max-height: 700px;
+            overflow-y: auto;
             border: 2px dashed #E2E8F0;
             border-radius: 12px;
             background-color: #F8FAFC;
             color: #64748B;
             font-size: 14px;
             font-family: 'DM Sans', sans-serif;
+        }
+        #visualizationPlaceholder {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            height: 100% !important;
+            text-align: center !important;
+            color: #64748B !important;
+            font-size: 14px !important;
+            font-family: 'DM Sans', sans-serif !important;
         }
 
         .empty-chart {
@@ -329,6 +348,8 @@
             color: #64748B;
             font-size: 14px;
             font-family: 'DM Sans', sans-serif;
+            /* New CSS property to make it take up remaining space */
+            flex: 1;
         }
 
         .chart-grid {
@@ -411,21 +432,19 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            
         }
 
         .chart-controls {
             display: flex;
             align-items: center;
             gap: 1rem;
-            margin-bottom: 0;        /* add this if not present */
-    padding-bottom: 0;
+            margin-bottom: 0;
+            padding-bottom: 0;
         }
 
- .chart-title-btn {
+        .chart-title-btn {
             padding: 0.4rem 1.2rem;
-       
-        transition: background 0.2s, color 0.2s;
+            transition: background 0.2s, color 0.2s;
             border: 1px solid #CBD5E1;
             border-radius: 9999px;
             font-size: 14px;
@@ -459,7 +478,7 @@
             color: #475569;
         }
 
-        .sync-btn {
+        .sync-btn, .download-btn {
             background-color: #7a7cff;
             color: white;
             padding: 0.5rem 1.5rem;
@@ -473,15 +492,30 @@
             white-space: nowrap;
         }
 
+        /* NEW: Styles for the loading indicator */
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #7a7cff;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         .hidden {
             display: none !important;
         }
 
-        .sync-btn.disabled {
-    filter: blur(1px);
-    opacity: 0.5;
-    pointer-events: none;
-}
+        .sync-btn.disabled, .download-btn.disabled {
+            filter: blur(1px);
+            opacity: 0.5;
+            pointer-events: none;
+        }
 
         /* Responsive Design */
         @media (max-width: 1200px) {
@@ -631,18 +665,15 @@
     </style>
 </head>
 <body>
-   <div class="app-container">
-        <!-- Sidebar -->
+    <div class="app-container">
         <div class="sidebar">
             <div class="sidebar-icons">
                 <div class="sidebar-icon selected" id="sidebarIcon1">
-                    <!-- ...icon SVG... -->
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M12 1.92139C12.4848 1.92139 12.9501 2.11382 13.293 2.45654L20.793 9.95654C20.9633 10.1259 21.0985 10.3274 21.1904 10.5493C21.2823 10.7712 21.3288 11.0094 21.3281 11.2495V20.2505C21.328 20.5361 21.2146 20.8101 21.0127 21.0122C20.8105 21.2144 20.5359 21.3286 20.25 21.3286H3.75C3.46407 21.3286 3.18949 21.2144 2.9873 21.0122C2.78539 20.8101 2.67199 20.5361 2.67188 20.2505V11.2495C2.67116 11.0094 2.71769 10.7712 2.80957 10.5493C2.90148 10.3274 3.03669 10.1259 3.20703 9.95654H3.20801L10.708 2.45654C11.0508 2.11401 11.5154 1.92139 12 1.92139ZM19.1719 11.3853L12 4.21338L4.82812 11.3853V19.1724H19.1719V11.3853Z" fill="#475569" stroke="#475569" stroke-width="0.09375"/>
                     </svg>
                 </div>
                 <div class="sidebar-icon" id="sidebarIcon2">
-                    <!-- ...icon SVG... -->
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path d="M8.99976 19.9219H14.9998C15.2856 19.9219 15.5603 20.0352 15.7625 20.2373C15.9646 20.4395 16.0779 20.7141 16.0779 21C16.0779 21.2859 15.9646 21.5605 15.7625 21.7627C15.5603 21.9648 15.2856 22.0781 14.9998 22.0781H8.99976C8.71408 22.0781 8.44013 21.9646 8.23804 21.7627C8.03585 21.5605 7.92163 21.2859 7.92163 21C7.92163 20.7141 8.03585 20.4395 8.23804 20.2373C8.44013 20.0354 8.71408 19.9219 8.99976 19.9219ZM11.9998 1.92188C14.0758 1.92188 16.0669 2.74687 17.5349 4.21484C19.003 5.6829 19.8279 7.67385 19.8279 9.75C19.8279 12.1517 20.2614 14.1696 21.0808 15.5791C21.242 15.8578 21.3265 16.1742 21.3269 16.4961C21.3272 16.8181 21.2425 17.135 21.0818 17.4141C20.9231 17.6932 20.6928 17.9253 20.4148 18.0859C20.137 18.2464 19.8215 18.33 19.5007 18.3281H4.49976C4.17822 18.3306 3.86131 18.2476 3.58276 18.0869C3.30431 17.9263 3.07365 17.6935 2.91479 17.4141C2.75493 17.1346 2.6715 16.818 2.67261 16.4961C2.67373 16.1741 2.75972 15.8575 2.92163 15.5791C3.74094 14.1696 4.17163 12.1525 4.17163 9.75C4.17163 7.67392 4.99663 5.68289 6.4646 4.21484C7.93259 2.74685 9.92371 1.92195 11.9998 1.92188ZM11.9998 4.07812C10.4956 4.0782 9.05263 4.67564 7.98901 5.73926C6.92542 6.80293 6.32788 8.24579 6.32788 9.75C6.32788 12.2896 5.90837 14.4253 5.08276 16.1045L5.04956 16.1719H18.95L18.9167 16.1045C18.0911 14.4253 17.6716 12.2887 17.6716 9.75C17.6716 8.24573 17.0742 6.80294 16.0105 5.73926C14.9468 4.67566 13.504 4.07812 11.9998 4.07812Z" fill="#475569" stroke="#475569" stroke-width="0.09375"/>
                     </svg>
@@ -650,17 +681,13 @@
             </div>
         </div>
 
-        <!-- Main Content -->
         <div class="main-content" id="mainContent">
-            <!-- Header -->
             <div class="header">
                 <h1> A Sliding Window Dynamic Time Warping-Based Approach for Time Series Data Synchronization </h1>
             </div>
 
-            <!-- Content Area -->
             <div class="content-area">
                 <div class="content-container">
-                    <!-- File Upload Section -->
                     <div class="upload-section">
                         <h2 class="upload-title">Upload file</h2>
                         <div class="upload-container">
@@ -674,14 +701,12 @@
                                 <p>Drag & Drop / Click to upload</p>
                             </div>
                             <div class="file-tags">
-                                <div class="file-tag">XLSX</div>
                                 <div class="file-tag">CSV</div>
                                 <div class="file-tag outline">&gt; 10 MB</div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Upload Progress -->
                     <div class="upload-progress" id="uploadProgress">
                         <div class="progress-card">
                             <div class="progress-info">
@@ -703,12 +728,39 @@
                                     </svg>
                                 </button>
                                 <button class="sync-btn" id="syncBtn">Sync Now</button>
+                                <div class="loader hidden" id="loader"></div>
                             </div>
-                            <button class="sync-btn" id="sendBtn" style="background: #10B981;">Send the File(s)</button>
                         </div>
                     </div>
 
-                    
+                    <div class="charts-section">
+                        <div class="chart-container">
+                            <div class="chart-area">
+                                <div class="file-visualization" id="fileVisualization">
+                                    <div id="visualizationPlaceholder">Upload a file to see data visualization</div>
+                                </div>
+                            </div>
+                            <div class="chart-footer">
+                                <div class="chart-controls">
+                                    <button class="chart-title-btn">Before Synchronization</button>
+                                    <div class="chart-badges"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chart-container">
+                            <div class="chart-area">
+                                <div class="file-visualization empty-chart" id="synchronizedChartContainer">
+                                    Synchronized data will appear here
+                                </div>
+                            </div>
+                            <div class="chart-footer">
+                                <div class="chart-controls">
+                                    <button class="chart-title-btn">After Synchronization</button>
+                                </div>
+                                <button class="download-btn disabled" id="downloadBtn">Download Synchronized Data</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -722,19 +774,16 @@
 
     </div>
 
-     <!-- Add this in your HTML head or before your script -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!-- PapaParse (CSV parsing) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-
-<!-- SheetJS (XLSX parsing) -->
-<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.7.1/dist/jszip.min.js"></script>
     <script>
         // Application state
         let appState = {
-            selectedFile: null,
+            uploadedFiles: [],
             uploadProgress: 0,
             isDragging: false,
             showTooltip1: false,
@@ -742,181 +791,257 @@
         };
 
         // DOM elements
-      // DOM elements
-const dropZone = document.getElementById('dropZone');
-const fileInput = document.getElementById('fileInput');
-const uploadProgress = document.getElementById('uploadProgress');
-const fileName = document.getElementById('fileName');
-const progressPercent = document.getElementById('progressPercent');
-const progressFill = document.getElementById('progressFill');
-const fileSize = document.getElementById('fileSize');
-const removeBtn = document.getElementById('removeBtn');
-const syncBtn = document.getElementById('syncBtn');
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const uploadProgress = document.getElementById('uploadProgress');
+        const fileName = document.getElementById('fileName');
+        const progressPercent = document.getElementById('progressPercent');
+        const progressFill = document.getElementById('progressFill');
+        const fileSize = document.getElementById('fileSize');
+        const removeBtn = document.getElementById('removeBtn');
+        const syncBtn = document.getElementById('syncBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const tooltips = document.querySelectorAll('.chart-tooltip');
+        const loader = document.getElementById('loader');
 
-let uploadedFiles = [];
+        const sidebarIcon1 = document.getElementById('sidebarIcon1');
+        const sidebarIcon2 = document.getElementById('sidebarIcon2');
+        const mainContent = document.getElementById('mainContent');
+        const placeholderContent = document.getElementById('placeholderContent');
+        const fileVisualization = document.getElementById('fileVisualization');
+        const synchronizedChartContainer = document.getElementById('synchronizedChartContainer');
 
-// File upload handlers
-dropZone.addEventListener('click', (e) => {
-    if (e.target !== fileInput) {
-        fileInput.click();
-    }
-});
+        let synchronizedDataBlob = null;
+        let synchronizedCharts = [];
+        let chartInstances = [];
 
-dropZone.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    dropZone.classList.add('dragging');
-});
-
-dropZone.addEventListener('dragleave', (e) => {
-    e.preventDefault();
-    dropZone.classList.remove('dragging');
-});
-
-dropZone.addEventListener('drop', (e) => {
-    e.preventDefault();
-    dropZone.classList.remove('dragging');
-    const files = Array.from(e.dataTransfer.files)
-        .filter(file => file.type === 'text/csv' || file.name.endsWith('.xlsx') || file.name.endsWith('.csv'));
-    if (files.length > 0) {
-        handleMultipleFiles(files.slice(0, 2));
-    }
-});
-
-fileInput.addEventListener('change', (e) => {
-    const files = Array.from(e.target.files)
-        .filter(file => file.type === 'text/csv' || file.name.endsWith('.xlsx') || file.name.endsWith('.csv'));
-    if (files.length > 0) {
-        handleMultipleFiles(files.slice(0, 2));
-    }
-});
-
-// Remove files
-removeBtn.addEventListener('click', () => {
-    uploadedFiles = [];
-    uploadProgress.classList.remove('visible');
-    fileInput.value = '';
-    progressFill.style.width = '0%';
-    fileSize.textContent = '0 MB';
-    fileName.textContent = '';
-    syncBtn.classList.add('disabled');
-});
-
-// Format file size
-function formatFileSize(bytes) {
-    if (bytes === 0) return '0 B';
-    const k = 1024;
-    const sizes = ['B', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-}
-
-// Handle multiple files
-async function handleMultipleFiles(files) {
-    uploadedFiles = files;
-    uploadProgress.classList.add('visible');
-    fileName.textContent = files.map(f => f.name).join(', ');
-    fileSize.textContent = files.map(f => formatFileSize(f.size)).join(' + ');
-    progressPercent.textContent = 0;
-    progressFill.style.width = '0%';
-    syncBtn.classList.add('disabled');
-
-    // Simulate upload progress
-    let progress = 0;
-    const interval = setInterval(() => {
-        progress += 10;
-        progressPercent.textContent = progress;
-        progressFill.style.width = progress + '%';
-        if (progress >= 100) {
-            clearInterval(interval);
-            syncBtn.classList.remove('disabled');
+        function selectSidebar(index) {
+            if (index === 1) {
+                sidebarIcon1.classList.add('selected');
+                sidebarIcon2.classList.remove('selected');
+                mainContent.classList.remove('hidden');
+                placeholderContent.classList.remove('visible');
+            } else {
+                sidebarIcon1.classList.remove('selected');
+                sidebarIcon2.classList.add('selected');
+                mainContent.classList.add('hidden');
+                placeholderContent.classList.add('visible');
+            }
         }
-    }, 100);
-}
 
-// Sync button sends files to endpoint
-syncBtn.addEventListener('click', async () => {
-    if (!uploadedFiles.length) return;
-    syncBtn.classList.add('disabled');
-    const formData = new FormData();
-    uploadedFiles.forEach((file, idx) => {
-        formData.append('file' + (idx + 1), file);
-    });
+        sidebarIcon1.addEventListener('click', () => selectSidebar(1));
+        sidebarIcon2.addEventListener('click', () => selectSidebar(2));
+        selectSidebar(1);
 
-    try {
-        await axios.post('YOUR_ENDPOINT_URL_HERE', formData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
-            onUploadProgress: function(progressEvent) {
-                if (progressEvent.total) {
-                    const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                    progressPercent.textContent = percent;
-                    progressFill.style.width = percent + '%';
+        async function handleMultipleFiles(files) {
+            appState.uploadedFiles = files;
+            appState.uploadProgress = 0;
+
+            uploadProgress.classList.add('visible');
+            fileName.textContent = files.map(f => f.name).join(', ');
+            fileSize.textContent = files.map(f => formatFileSize(f.size)).join(' + ');
+
+            syncBtn.classList.add('disabled');
+            downloadBtn.classList.add('disabled');
+
+            progressPercent.textContent = 0;
+            progressFill.style.width = '0%';
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 10;
+                progressPercent.textContent = progress;
+                progressFill.style.width = progress + '%';
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    syncBtn.classList.remove('disabled');
+                }
+            }, 200);
+
+            chartInstances.forEach(chart => chart.destroy());
+            chartInstances = [];
+            synchronizedCharts.forEach(chart => chart.destroy());
+            synchronizedCharts = [];
+            synchronizedChartContainer.innerHTML = 'Synchronized data will appear here';
+            synchronizedChartContainer.classList.add('empty-chart');
+
+
+            fileVisualization.innerHTML = '';
+            for (let i = 0; i < files.length; i++) {
+                const chartDiv = document.createElement('div');
+                chartDiv.style.marginBottom = '2rem';
+                chartDiv.innerHTML = `
+                    <div style="font-weight:600;margin-bottom:0.5rem; text-align: center;">${files[i].name}</div>
+                    <div style="min-height:220px;">
+                        <canvas id="accelerometerChart${i}" class="chart-canvas" style="height:180px;"></canvas>
+                    </div>
+                `;
+                fileVisualization.appendChild(chartDiv);
+
+                try {
+                    let data;
+                    if (files[i].name.endsWith('.csv')) {
+                        data = await parseCSV(files[i]);
+                    } else if (files[i].name.endsWith('.xlsx')) {
+                        data = await parseXLSX(files[i]);
+                    } else {
+                        throw new Error('Unsupported file format');
+                    }
+                    const chart = createAccelerometerChart(data, `accelerometerChart${i}`);
+                    chartInstances.push(chart);
+                } catch (error) {
+                    chartDiv.innerHTML += `<div style="color:#EF4444;">Error: ${error.message}</div>`;
                 }
             }
-        });
-        alert('Files uploaded successfully!');
-    } catch (error) {
-        alert('Upload failed: ' + (error.response?.data?.message || error.message));
-    }
-    syncBtn.classList.remove('disabled');
-});
+        }
 
-const sendBtn = document.getElementById('sendBtn');
-
-sendBtn.addEventListener('click', async () => {
-    if (!uploadedFiles.length) {
-        alert('No files to send!');
-        return;
-    }
-    sendBtn.disabled = true;
-    const formData = new FormData();
-    uploadedFiles.forEach((file, idx) => {
-        formData.append('file' + (idx + 1), file);
-    });
-
-    try {
-        const response = await axios.post('http://localhost:3333/syncFiles', formData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
-            responseType: 'blob',
-            onUploadProgress: function(progressEvent) {
-                if (progressEvent.total) {
-                    const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                    progressPercent.textContent = percent;
-                    progressFill.style.width = percent + '%';
-                }
+        dropZone.addEventListener('click', (e) => {
+            if (e.target !== fileInput) {
+                fileInput.click();
             }
         });
-        const blob = new Blob([response.data], { type: 'application/zip' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'sync_files.zip';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        window.URL.revokeObjectURL(url);
-        alert('Files synchronized and downloaded successfully!');
-    } catch (error) {
-        alert('Send failed: ' + (error.response?.data?.message || error.message));
-    }
-    sendBtn.disabled = false;
-});
-        // Parse CSV file and extract data
-function parseCSV(file) {
-    return new Promise((resolve, reject) => {
-        Papa.parse(file, {
-            header: true,
-            dynamicTyping: true,
-            skipEmptyLines: true, // helps avoid blank rows
-            complete: function(results) {
-                resolve(results.data);
-            },
-            error: function(error) {
-                reject(error);
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragging');
+            appState.isDragging = true;
+        });
+
+        dropZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragging');
+            appState.isDragging = false;
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragging');
+            appState.isDragging = false;
+
+            const files = Array.from(e.dataTransfer.files).filter(file => file.type === 'text/csv' || file.name.endsWith('.csv') || file.name.endsWith('.xlsx'));
+            if (files.length !== 2) {
+                alert('Please upload exactly 2 CSV or XLSX files.');
+                return;
+            }
+            handleMultipleFiles(files);
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files).filter(file => file.type === 'text/csv' || file.name.endsWith('.csv') || file.name.endsWith('.xlsx'));
+            if (files.length !== 2) {
+                alert('Please select exactly 2 CSV or XLSX files.');
+                fileInput.value = '';
+                return;
+            }
+            handleMultipleFiles(files);
+        });
+
+        fileInput.addEventListener('click', (e) => {
+            e.stopPropagation();
+        });
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 B';
+
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        removeBtn.addEventListener('click', () => {
+            appState.uploadedFiles = [];
+            appState.uploadProgress = 0;
+            uploadProgress.classList.remove('visible');
+            fileInput.value = '';
+            progressFill.style.width = '0%';
+            fileSize.textContent = '0 MB';
+            updateFileVisualization(null);
+            syncBtn.classList.add('disabled');
+            downloadBtn.classList.add('disabled');
+            loader.classList.add('hidden');
+            synchronizedDataBlob = null;
+            chartInstances.forEach(chart => chart.destroy());
+            chartInstances = [];
+            synchronizedCharts.forEach(chart => chart.destroy());
+            synchronizedCharts = [];
+            synchronizedChartContainer.innerHTML = 'Synchronized data will appear here';
+            synchronizedChartContainer.classList.add('empty-chart');
+        });
+
+        syncBtn.addEventListener('click', async () => {
+            if (appState.uploadedFiles.length < 2) {
+                alert('Please upload two files first.');
+                return;
+            }
+
+            syncBtn.classList.add('hidden');
+            downloadBtn.classList.add('disabled');
+            loader.classList.remove('hidden');
+
+            const formData = new FormData();
+            appState.uploadedFiles.forEach((file, index) => {
+                formData.append(`file${index + 1}`, file);
+            });
+
+            try {
+                const response = await axios.post('http://localhost:3333/syncFiles', formData, {
+                    responseType: 'blob',
+                    onUploadProgress: (progressEvent) => {
+                        const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                        console.log(`Upload Progress: ${percentCompleted}%`);
+                    }
+                });
+
+                synchronizedDataBlob = new Blob([response.data], { type: 'application/zip' });
+                downloadBtn.classList.remove('disabled');
+                syncBtn.classList.remove('hidden');
+                syncBtn.textContent = 'Resync';
+                
+                await renderSynchronizedCharts(synchronizedDataBlob);
+
+            } catch (error) {
+                console.error('Synchronization failed:', error);
+                alert('Synchronization failed. Please check the server and try again.');
+                syncBtn.classList.remove('hidden');
+                syncBtn.textContent = 'Sync Now';
+
+            } finally {
+                loader.classList.add('hidden');
             }
         });
-    });
-}
-        // Parse XLSX file and extract data
+
+        downloadBtn.addEventListener('click', () => {
+            if (synchronizedDataBlob) {
+                const url = window.URL.createObjectURL(synchronizedDataBlob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', 'synchronized_data.zip');
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                window.URL.revokeObjectURL(url);
+            } else {
+                alert('No synchronized data available to download.');
+            }
+        });
+        
+        function parseCSV(file) {
+            return new Promise((resolve, reject) => {
+                Papa.parse(file, {
+                    header: true,
+                    dynamicTyping: true,
+                    skipEmptyLines: true,
+                    complete: function(results) {
+                        resolve(results.data);
+                    },
+                    error: function(error) {
+                        reject(error);
+                    }
+                });
+            });
+        }
+
         function parseXLSX(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -939,10 +1064,256 @@ function parseCSV(file) {
             });
         }
 
-        // Detect accelerometer data columns
-      
-      
-    </script>
+        function detectAccelerometerColumns(data) {
+            if (!data || data.length === 0) return null;
 
+            const firstRow = data[0];
+            const columns = Object.keys(firstRow);
+
+            const xColumn = columns.find(col => /_x$/i.test(col));
+            const yColumn = columns.find(col => /_y$/i.test(col));
+            const zColumn = columns.find(col => /_z$/i.test(col));
+
+            const xColFallback = columns.find(col => col.toLowerCase().includes('x'));
+            const yColFallback = columns.find(col => col.toLowerCase().includes('y'));
+            const zColFallback = columns.find(col => col.toLowerCase().includes('z'));
+
+            return {
+                x: xColumn || xColFallback,
+                y: yColumn || yColFallback,
+                z: zColumn || zColFallback,
+                time: columns.find(col => /time|timestamp|sample|index|frame|step|count|num|seq/i.test(col)) || 'index'
+            };
+        }
+
+        function createAccelerometerChart(data, canvasId, title = '3D Accelerometer Data') {
+            const columns = detectAccelerometerColumns(data);
+
+            if (!columns || !columns.x || !columns.y || !columns.z) {
+                const container = document.getElementById(canvasId).parentElement;
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 2rem;">
+                        <div style="color: #EF4444; margin-bottom: 1rem;">⚠️</div>
+                        <div style="font-weight: 600; margin-bottom: 0.5rem;">Unable to detect accelerometer data</div>
+                        <div style="font-size: 12px; opacity: 0.7;">Expected columns: X, Y, Z axis data</div>
+                        <div style="font-size: 11px; margin-top: 0.5rem; opacity: 0.5;">
+                            Found columns: ${Object.keys(data[0] || {}).join(', ')}
+                        </div>
+                    </div>
+                `;
+                return null;
+            }
+
+            const DOWNSAMPLE_EVERY = 10;
+            const chartData = data
+                .map((row, index) => ({
+                    time: columns.time === 'index' ? index : row[columns.time],
+                    x: parseFloat(row[columns.x]),
+                    y: parseFloat(row[columns.y]),
+                    z: parseFloat(row[columns.z])
+                }))
+                .filter((row, index) =>
+                    index % DOWNSAMPLE_EVERY === 0 &&
+                    !isNaN(row.x) && !isNaN(row.y) && !isNaN(row.z)
+                );
+
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+
+            const config = {
+                type: 'line',
+                data: {
+                    labels: chartData.map(d => d.time),
+                    datasets: [
+                        {
+                            label: 'X-axis',
+                            data: chartData.map(d => d.x),
+                            borderColor: '#EF4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            borderWidth: 2,
+                            fill: false,
+                            tension: 0.1
+                        },
+                        {
+                            label: 'Y-axis',
+                            data: chartData.map(d => d.y),
+                            borderColor: '#10B981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            borderWidth: 2,
+                            fill: false,
+                            tension: 0.1
+                        },
+                        {
+                            label: 'Z-axis',
+                            data: chartData.map(d => d.z),
+                            borderColor: '#3B82F6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderWidth: 2,
+                            fill: false,
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: columns.time === 'index' ? 'Sample' : columns.time
+                            }
+                        },
+                        y: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Acceleration (g)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: `${title} (${chartData.length} samples)`
+                        }
+                    }
+                }
+            };
+
+            return new Chart(ctx, config);
+        }
+
+        async function updateFileVisualization(file) {
+            const fileVisualization = document.getElementById('fileVisualization');
+
+            if (!file) {
+                fileVisualization.innerHTML = `
+                    <div id="visualizationPlaceholder">Upload a file to see data visualization</div>
+                `;
+                if (currentChart) {
+                    currentChart.destroy();
+                    currentChart = null;
+                }
+                return;
+            }
+
+            fileVisualization.innerHTML = `
+                <div id="visualizationPlaceholder">
+                    <div style="margin-bottom: 1rem;">
+                        <div style="width: 32px; height: 32px; border: 3px solid #E2E8F0; border-top: 3px solid #3276E8; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+                    </div>
+                    <div style="font-weight: 600; margin-bottom: 0.5rem;">Parsing ${file.name}</div>
+                    <div style="font-size: 12px; opacity: 0.7;">Processing data...</div>
+                </div>
+            `;
+
+            try {
+                let data;
+
+                if (file.name.endsWith('.csv')) {
+                    data = await parseCSV(file);
+                } else if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+                    data = await parseXLSX(file);
+                } else {
+                    throw new Error('Unsupported file format');
+                }
+
+                fileVisualization.innerHTML = '';
+                const canvas = document.createElement('canvas');
+                canvas.id = 'accelerometerChart';
+                fileVisualization.appendChild(canvas);
+
+                createAccelerometerChart(data, 'accelerometerChart');
+
+            } catch (error) {
+                console.error('Error parsing file:', error);
+                fileVisualization.innerHTML = `
+                    <div id="visualizationPlaceholder" style="padding: 2rem;">
+                        <div style="color: #EF4444; margin-bottom: 1rem;">❌</div>
+                        <div style="font-weight: 600; margin-bottom: 0.5rem;">Error parsing file</div>
+                        <div style="font-size: 12px; opacity: 0.7;">${error.message}</div>
+                    </div>
+                `;
+            }
+        }
+        
+        async function renderSynchronizedCharts(zipBlob) {
+            synchronizedChartContainer.innerHTML = `
+                <div id="visualizationPlaceholder">
+                    <div style="margin-bottom: 1rem;">
+                        <div style="width: 32px; height: 32px; border: 3px solid #E2E8F0; border-top: 3px solid #3276E8; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+                    </div>
+                    <div style="font-weight: 600; margin-bottom: 0.5rem;">Unzipping synchronized data...</div>
+                </div>
+            `;
+
+            synchronizedCharts.forEach(chart => chart.destroy());
+            synchronizedCharts = [];
+
+            try {
+                const zip = new JSZip();
+                const unzipped = await zip.loadAsync(zipBlob);
+                
+                synchronizedChartContainer.classList.remove('empty-chart');
+                synchronizedChartContainer.innerHTML = '';
+                synchronizedChartContainer.style.display = 'flex';
+                synchronizedChartContainer.style.flexDirection = 'column';
+                synchronizedChartContainer.style.gap = '2rem';
+                synchronizedChartContainer.style.height = '100%';
+                synchronizedChartContainer.style.overflowY = 'auto';
+
+
+                const fileEntries = Object.keys(unzipped.files).filter(filename => !unzipped.files[filename].dir);
+                
+                for(let i = 0; i < fileEntries.length; i++) {
+                    const filename = fileEntries[i];
+                    const fileContent = await unzipped.files[filename].async("blob");
+                    const file = new File([fileContent], filename);
+                    
+                    let data;
+                    if (filename.endsWith('.csv')) {
+                        data = await parseCSV(file);
+                    } else if (filename.endsWith('.xlsx')) {
+                        data = await parseXLSX(file);
+                    }
+
+                    const chartDiv = document.createElement('div');
+                    chartDiv.innerHTML = `
+                        <div style="font-weight:600;margin-bottom:0.5rem; text-align: center;">${filename}</div>
+                        <div style="min-height:220px;">
+                            <canvas id="synchronizedChart${i}" style="height:180px;"></canvas>
+                        </div>
+                    `;
+                    synchronizedChartContainer.appendChild(chartDiv);
+                    
+                    const chartInstance = createAccelerometerChart(data, `synchronizedChart${i}`, `Synchronized Data - ${filename}`);
+                    if (chartInstance) {
+                        synchronizedCharts.push(chartInstance);
+                    }
+                }
+
+            } catch (error) {
+                console.error("Error unzipping or plotting synchronized data:", error);
+                synchronizedChartContainer.innerHTML = `
+                    <div id="visualizationPlaceholder" style="padding: 2rem;">
+                        <div style="color: #EF4444; margin-bottom: 1rem;">❌</div>
+                        <div style="font-weight: 600; margin-bottom: 0.5rem;">Error processing synchronized data</div>
+                        <div style="font-size: 12px; opacity: 0.7;">${error.message}</div>
+                    </div>
+                `;
+                synchronizedChartContainer.classList.add('empty-chart');
+            }
+        }
+
+    </script>
 </body>
 </html>
