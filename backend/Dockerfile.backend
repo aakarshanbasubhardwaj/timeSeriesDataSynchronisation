@@ -1,0 +1,42 @@
+# Build dependencies
+FROM node:18-alpine AS build
+
+# Install Python and pip
+RUN apk add --no-cache python3 py3-pip
+
+# Set working directory
+WORKDIR /app
+
+# Set up python virtual env
+RUN python3 -m venv /venv
+RUN /venv/bin/pip install --upgrade pip
+
+# Install npm dependencies
+COPY package*.json ./
+RUN npm install --only=production
+
+# Install python dependencies
+COPY requirements.txt ./
+RUN /venv/bin/pip install --no-cache-dir -r requirements.txt
+
+# Copy remaining files
+COPY . .
+
+# Runtime
+FROM node:18-alpine
+
+# Install Python and pip in final image
+RUN apk add --no-cache python3 py3-pip
+
+# Set working directory
+WORKDIR /app
+
+# Copy app and dependencies from build stage
+COPY --from=build /app /app
+COPY --from=build /venv /venv
+
+# Add venv to PATH so python & pip use virtual env
+ENV PATH="/venv/bin:$PATH"
+
+# Start the server
+CMD ["node", "server.js"]
