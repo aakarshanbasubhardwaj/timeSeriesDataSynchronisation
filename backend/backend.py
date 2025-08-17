@@ -11,22 +11,17 @@ def calculateMagnitude(inputFile):
     df = pd.read_csv(inputFile, low_memory=False)
     mag_df = pd.DataFrame()
     
-    required_cols = ['acc_x', 'acc_y', 'acc_z']
-    if all(col in df.columns for col in required_cols):
-        magnitude = np.sqrt(
-            df['acc_x'].astype(float)**2 +
-            df['acc_y'].astype(float)**2 +
-            df['acc_z'].astype(float)**2
-        )
-        mag_df['magnitude'] = magnitude
-        filename = os.path.basename(inputFile)
-        output_filename = filename.replace(".csv", "_magnitude.csv")
-        mag_df.to_csv(output_filename, index=False)
-        print(f"Saved magnitude files", file=sys.stderr)
-        return output_filename        
-    else:
-        print(f"Required columns missing in {inputFile}. Needed: {required_cols}", file=sys.stderr)
-        exit(1)
+    x = df.iloc[:, 0].astype(float)
+    y = df.iloc[:, 1].astype(float)
+    z = df.iloc[:, 2].astype(float)
+
+    magnitude = np.sqrt(x**2 + y**2 + z**2)
+    mag_df['magnitude'] = magnitude
+    filename = os.path.basename(inputFile)
+    output_filename = filename.replace(".csv", "_magnitude.csv")
+    mag_df.to_csv(output_filename, index=False)
+    print(f"Saved magnitude files", file=sys.stderr)
+    return output_filename        
 
 def compute_variance(input_csv, window_size=50):
     print("computing varaince", file=sys.stderr)
@@ -38,7 +33,6 @@ def compute_variance(input_csv, window_size=50):
         raise ValueError("Window size must be less than or equal to length of signal.")
 
     var_data = {'index': np.arange(window_size // 2, n - window_size // 2 +1)}
-    
 
     signal = df.to_numpy(dtype=float)
 
@@ -136,7 +130,6 @@ def process_single_window(args):
     window = reference_magnitudes_values[win_start:win_end]    
     window_size = len(window)
 
-
     for start_idx in range(len(target_search_segment) - window_size + 1):
         candidate = target_search_segment[start_idx:start_idx + window_size]
         distance = dtw.distance_fast(window, candidate)
@@ -151,7 +144,6 @@ def process_single_window(args):
     
     target_start = target_search_start + best_start_idx
     target_end = target_start + window_size
-    
 
     return [
         win_start,
