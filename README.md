@@ -8,7 +8,7 @@
 2. **Open terminal and go to the backend folder in the repository :**
    
    ```bash
-   cd backend
+   cd timeSeriesDataSynchronisation/backend
    ```
 
 3. **Install backend dependencies :**
@@ -27,7 +27,7 @@
 5. **Install python dependencies**
 
    ```bash
-   pip install requirements.txt
+   pip install -r requirements.txt
    ```
 
 6. **Start backend server :**
