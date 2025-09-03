@@ -47,7 +47,7 @@ Once the above mentioned dependencies are resolved follow the below steps
 - Navigate to the directory containing the experiment branch cloned previously.
 - Create a folder in this directory called ```raw_data```
 ```bash
-mkdir experiment/raw_data
+mkdir raw_data
 ```
 - Copy the downloaded source data from WEAR in the raw_data folder.
 
