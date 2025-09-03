@@ -60,6 +60,8 @@ experiment/
 │   ├── ...
 │   ├── sbj_24.csv
 ├── experiment.ipynb
+├── graph.ipynb
+├── README.md
 ├── requirements.txt
 ```
 - If your directory structure looks any different from the above, the experiment will fail to execute successfully. Please make sure you have the exact same structure as shown above. If not, then please follow the [setup steps](#experiment-setup) again to have the same structure as required.
@@ -71,7 +73,8 @@ jupyter notebook
 ```
 - Navigate to the folder location created in step 1 and open the experiment.ipynb file in jupyter notebook.
 - Run the code using the run button.
-- This will start executing the experiment and generate detailed reports in a .csv format under the location ```reports/```.
+- This will start executing the experiment and generate detailed reports in a .csv file named ```dtw_results.csv```.
+-Open the graph.ipynb file in jupyter notebook and run the code to visualise the results.
 - Upon experiment completion graphs will be generated and saved in the location ```graphs```.
 
 # What happens in the experiment
