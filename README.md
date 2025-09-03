@@ -1,4 +1,4 @@
-## Local Development
+# Local Development
 
 1. **Clone the repository**
    ```bash
@@ -39,3 +39,7 @@
 7. **Open `frontend/index.html` in your browser to use the frontend**
 
 - Backend runs on the port defined in backend env file (e.g., localhost:3333).
+
+# Experiment Replication
+
+To replicate the experiment and to see the results, switch to the ```experiment``` branch and follow the instructions in the README.md file by clicking [here](https://github.com/aakarshanbasubhardwaj/timeSeriesDataSynchronisation/tree/experiment)
