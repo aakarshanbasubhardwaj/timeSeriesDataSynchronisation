@@ -9,3 +9,5 @@ node_modules/
 .vscode/
 #any csv files
 *.csv
+#jupyter notebook checkpoints
+.ipynb_checkpoints/
