@@ -7,6 +7,7 @@ from dtaidistance import dtw
 from concurrent.futures import ProcessPoolExecutor, as_completed
 import sys
 
+# calculate 3d accelerometer magnitude
 def calculateMagnitude(inputFile): 
     df = pd.read_csv(inputFile, low_memory=False)
     mag_df = pd.DataFrame()
@@ -17,12 +18,14 @@ def calculateMagnitude(inputFile):
 
     magnitude = np.sqrt(x**2 + y**2 + z**2)
     mag_df['magnitude'] = magnitude
+    # save under filename pattern originalFilename_magnitude.csv
     filename = os.path.basename(inputFile)
     output_filename = filename.replace(".csv", "_magnitude.csv")
     mag_df.to_csv(output_filename, index=False)
     print(f"Saved magnitude files", file=sys.stderr)
     return output_filename        
 
+# calculate variance from the magnitude file - to help identification of rest and motion segments
 def compute_variance(input_csv, window_size=50):
     print("computing varaince", file=sys.stderr)
     df = pd.read_csv(input_csv, low_memory=False)
@@ -46,13 +49,14 @@ def compute_variance(input_csv, window_size=50):
     mean_x2 = sum_x2 / window_size
 
     variance = mean_x2 - mean_x**2
-
+    # save under filename pattern originalFilename_variance.csv
     var_data[f'{input_csv.replace('_magnitude.csv', '_variance')}'] = variance
 
     var_df = pd.DataFrame(var_data)
     var_df.to_csv(input_csv.replace('_magnitude', '_variance'), index=False)
     return var_df
 
+# identify and label rest and motion segments throughout the stream
 def label_rest_motion(magnitudeFile, var_df, threshold=0.002):
     var_col = magnitudeFile.replace('_magnitude.csv', '_variance')
     
@@ -76,6 +80,7 @@ def label_rest_motion(magnitudeFile, var_df, threshold=0.002):
 
     return labels.tolist()
 
+# find windows with almost equal number of rest and motion segments
 def get_balanced_windows(labels, window_size=200):
     print("computing balanced window", file=sys.stderr)
     windows = []
@@ -118,7 +123,7 @@ def get_balanced_windows(labels, window_size=200):
 
     return windows
 
-
+# dtw matching task executed by parallel workers for each identified balanced windows
 def process_single_window(args):
 
     reference_magnitudes_values, target_search_segment, window_indices, idx, target_search_start = args
@@ -153,6 +158,7 @@ def process_single_window(args):
         min_distance
     ]
 
+# task pool creation and assignment to workers
 def run_dtw_matching_parallel(reference_magnitudes, target_magnitudes_values, balanced_windows, reference_labels, target_labels, max_workers=4):
 
     results_csv = "dtw_results.csv"
@@ -186,6 +192,7 @@ def run_dtw_matching_parallel(reference_magnitudes, target_magnitudes_values, ba
         )
         args_list.append(args)
 
+    # handling critical section by reducing each workers output upon task completion
     results = []
 
     with ProcessPoolExecutor(max_workers=max_workers) as executor:
@@ -227,6 +234,7 @@ def trim_csv(file_path, medianOffset, output_path):
     trimmed_df = df.iloc[medianOffset:] if medianOffset > 0 else df
     trimmed_df.to_csv(output_path, index=False)
 
+# delete temp files
 def clearFiles():
     for filename in os.listdir('.'):
         if filename.endswith('.csv'):
@@ -263,11 +271,11 @@ def sync(file1, file2):
 if __name__ == "__main__":
 
     file1, file2 = sys.argv[1], sys.argv[2]
-
+    # run the algorithm both ways round for each set of files uploaded
     medianOffset1 = sync(file1, file2)
     medianOffset2 = sync(file2, file1)
     finalOffset = 0
-
+    
     if medianOffset1 > medianOffset2 :
         finalOffset = medianOffset1
     else :
