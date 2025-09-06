@@ -210,14 +210,24 @@ def run_dtw_matching_parallel(reference_magnitudes, target_magnitudes_values, ba
         for res in results:
             writer.writerow(res)
 
+def remove_outliers_iqr(series):
+    Q1 = series.quantile(0.25)
+    Q3 = series.quantile(0.75)
+    IQR = Q3 - Q1
+    lower = Q1 - 1.5 * IQR
+    upper = Q3 + 1.5 * IQR
+    return series[(series >= lower) & (series <= upper)]
+
 def getMedianOffset(resultsCSV):
     df = pd.read_csv(resultsCSV)
 
-    filtered = df[df['DTW Distance'] < 10].copy()
+    top_count = max(1, int(len(df) * 0.3))
+    filtered = df.nsmallest(top_count, 'DTW Distance').copy()
 
     filtered['Offset'] = filtered['Target Start'] - filtered['Ref Start']
+    filtered_offsets = remove_outliers_iqr(filtered['Offset'])
 
-    median_offset = filtered['Offset'].median()
+    median_offset = abs(filtered['Offset'].median())
 
     if pd.isna(median_offset):
         return 0
