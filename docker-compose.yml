@@ -1,5 +1,5 @@
 services:
-  backend:
+  tsdsbackend:
     build:
       context: ./backend
       dockerfile: Dockerfile.backend
@@ -10,14 +10,14 @@ services:
     networks:
       - app-network
 
-  nginx:
+  tsdsfrontend:
     build:
       context: .
       dockerfile: ./nginx/Dockerfile.nginx
     ports:
       - "8080:80"
     depends_on:
-      - backend
+      - tsdsbackend
     networks:
       - app-network
 
