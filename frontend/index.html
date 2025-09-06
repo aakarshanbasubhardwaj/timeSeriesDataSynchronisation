@@ -705,7 +705,7 @@
                         <div class="upload-progress" id="uploadProgress">
                             <div class="progress-card">
                                 <div class="progress-info">
-                                    <h3 id="fileName">subject01-surface.csv</h3>
+                                    <h3 id="fileName"></h3>
                                     <p>
                                         <span class="blue-text" id="progressPercent">0</span>
                                         <span class="blue-text">% Uploading</span>
@@ -824,9 +824,9 @@
             let synchronizedDataBlob = null;
             let synchronizedCharts = [];
             let chartInstances = [];
-            
+            // plot columns
             const columns = { time: "time", x: "x", y: "y", z: "z" };
-
+            // uplot options and data
             function getUPlotConfig(chartData, title, columns, parentWidth, parentHeight) {
                 const time = chartData.map((d) => d.time);
                 const x = chartData.map((d) => d.x);
@@ -860,7 +860,7 @@
 
                 return { uPlotOpts, uPlotdata };
             }
-
+            // prevent uPlot zoom to area with no values
             function findClosest(arr, val) {
                 let low = 0;
                 let high = arr.length - 1;
@@ -880,7 +880,7 @@
                 return (Math.abs(prev - val) < Math.abs(curr - val)) ? prev : curr;
             }
 
-
+            // process uploaded files and plot the chart
             async function handleMultipleFiles(files) {
                 appState.uploadedFiles = files;
                 appState.uploadProgress = 0;
@@ -943,6 +943,7 @@
                     const height = fileVisualization.clientHeight;
                     const { uPlotOpts: opts1, uPlotdata: data1 } = getUPlotConfig(chartData, `${files[i].name}`, columns, width, height);
                     const fileVisualizationUPlot = new uPlot(opts1,data1,document.getElementById("fileVisualization"));
+                    // zoom events
                     fileVisualizationUPlot.root.addEventListener("wheel",
                         function (e) {
                             e.preventDefault();
@@ -1002,7 +1003,7 @@
                         dragStartMin = fileVisualizationUPlot.scales.x.min;
                         dragStartMax = fileVisualizationUPlot.scales.x.max;
                     });
-
+                    // mouse drag events
                     root.addEventListener("mouseup", (e) => {
                         isDragging = false;
                     });
@@ -1056,7 +1057,7 @@
                 }
                 }
             }
-
+            // fileDropZone events
             dropZone.addEventListener("click", (e) => {
                 if (e.target !== fileInput) {
                 fileInput.click();
@@ -1156,7 +1157,7 @@
                 formData.append(`file${index + 1}`, file);
                 });
 
-                try {
+                try { // send request to backend for synchronization
                     const response = await axios.post(
                         API_BASE_URL + "syncFiles",
                         formData,
@@ -1169,7 +1170,7 @@
                             },
                         }
                     );
-
+                    // capture api response
                     synchronizedDataBlob = new Blob([response.data], {
                         type: "application/zip",
                     });
@@ -1177,7 +1178,7 @@
                     syncBtn.classList.remove("hidden");
                     syncBtn.textContent = "Resync";
 
-                    await renderSynchronizedCharts(synchronizedDataBlob);
+                    await renderSynchronizedCharts(synchronizedDataBlob); // display synchronized charts
                 } catch (error) {
                     console.error("Synchronization failed:", error);
                     alert(
@@ -1189,7 +1190,7 @@
                     loader.classList.add("hidden");
                 }
             });
-
+            // download synchronized zip file
             downloadBtn.addEventListener("click", () => {
                 if (synchronizedDataBlob) {
                     const url = window.URL.createObjectURL(synchronizedDataBlob);
@@ -1220,7 +1221,7 @@
                     });
                 });
             }
-
+            // extract columns from the files
             function detectAccelerometerColumns(data) {
                 if (!data || data.length === 0) return null;
 
@@ -1251,7 +1252,7 @@
 
                 
             }
-
+            // display uPlot char for the synchronized data
             async function renderSynchronizedCharts(zipBlob) {
                 synchronizedChartContainer.innerHTML = `
                     <div id="visualizationPlaceholder">
