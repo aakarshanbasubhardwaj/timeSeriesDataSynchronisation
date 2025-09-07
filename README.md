@@ -1,3 +1,51 @@
+# Using the app
+
+There are two ways to use this application
+
+## Docker
+
+### Linux distros
+
+- Please follow steps to install docker engine for you operating system [here](https://docs.docker.com/engine/install/)
+- Once you have docker engine installed on your system download and extract [release]()
+- Run the startApp shell script 
+   ```bash
+   ./startApp.sh
+   ```
+   - If the script does not run try again after making the script executable using 
+      ```bash
+      chmod +x startApp.sh
+      ```
+- Visit [localhost:8080/](localhost:8080/) to start using the app.
+
+### Mac OS
+
+- Please follow steps to install docker desktop for you operating system [here](https://www.docker.com/get-started/)
+- Once you have docker desktop installed on your system download and extract [release]()
+- Run the startApp shell script 
+   ```bash
+   ./startApp.sh
+   ```
+   - If the script does not run try again after making the script executable using 
+      ```bash
+      chmod +x startApp.sh
+      ```
+- Visit [localhost:8080/](localhost:8080/) to start using the app.
+
+### Windows
+
+- Please follow steps to install docker desktop for you operating system [here](https://www.docker.com/get-started/)
+- Once you have docker desktop installed on your system download and extract [release]()
+- Run the startApp shell script 
+   ```bash
+   ./startApp.sh
+   ```
+   - If the script does not run try again after making the script executable using 
+      ```bash
+      chmod +x startApp.sh
+      ```
+- Visit [localhost:8080/](localhost:8080/) to start using the app.
+
 # Local Development
 
 1. **Clone the repository**
