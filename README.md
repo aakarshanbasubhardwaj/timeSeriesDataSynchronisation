@@ -2,12 +2,63 @@
 
 There are two ways to use this application
 
-## Docker
+## A. Python GUI
+
+
+### Linux distros
+
+- Make sure Python is installed on your system. 
+- After installing Python, download and extract [release v1.1.0](https://github.com/aakarshanbasubhardwaj/timeSeriesDataSynchronisation/releases/tag/v1.1.0) - v1.1.0.tar.gz
+- Run the startApp shell script from terminal using
+   ```bash
+   ./startApp.sh
+   ```
+   - If the script does not run try again after making the script executable using 
+      ```bash
+      chmod +x startApp.sh
+      ```
+- Visit [localhost:8501/](localhost:8501/) to start using the app.
+
+### Mac OS
+
+- Make sure Python is installed on your system. 
+- After installing Python, download and extract [release v1.1.0](https://github.com/aakarshanbasubhardwaj/timeSeriesDataSynchronisation/releases/tag/v1.1.0) - v1.1.0.tar.gz
+- Run the startApp shell script from terminal using
+   ```bash
+   ./startApp.sh
+   ```
+   - If the script does not run try again after making the script executable using 
+      ```bash
+      chmod +x startApp.sh
+      ```
+- Visit [localhost:8501/](localhost:8501/) to start using the app.
+
+### Windows
+
+- Make sure Python and GCC (C compiler) are installed on your system. 
+- After installing both, download and extract [release v1.1.0](https://github.com/aakarshanbasubhardwaj/timeSeriesDataSynchronisation/releases/tag/v1.1.0) - v1.1.0.tar.gz
+- You can start the app in either of these ways :
+
+1. Open a command prompt, navigate to the extracted folder
+```bash
+   cd v1.1.0
+   ```
+   or
+```bash
+   cd v1.1.0/v1.1.0
+   ```
+2. Double-click the *startApp.bat* file in the extracted folder (no command prompt needed).
+
+- Visit [localhost:8501/](localhost:8501/) to start using the app.
+
+
+
+## B. Docker
 
 ### Linux distros
 
 - Please follow steps to install docker engine for you operating system [here](https://docs.docker.com/engine/install/)
-- Once you have docker engine installed on your system download and extract [release v1.1.0](https://github.com/aakarshanbasubhardwaj/timeSeriesDataSynchronisation/releases/download/v1.0.0/v1.0.0.zip)
+- Once you have docker engine installed on your system download and extract [release v1.1.0](https://github.com/aakarshanbasubhardwaj/timeSeriesDataSynchronisation/releases/tag/v1.1.0)
 - Run the startApp shell script from terminal using
    ```bash
    ./startApp.sh
@@ -21,7 +72,7 @@ There are two ways to use this application
 ### Mac OS
 
 - Please follow steps to install docker desktop for you operating system [here](https://www.docker.com/get-started/)
-- Once you have docker desktop installed on your system download and extract [release v1.1.0](https://github.com/aakarshanbasubhardwaj/timeSeriesDataSynchronisation/releases/download/v1.0.0/v1.0.0.zip)
+- Once you have docker desktop installed on your system download and extract [release v1.1.0](https://github.com/aakarshanbasubhardwaj/timeSeriesDataSynchronisation/releases/tag/v1.1.0)
 - Run the startApp shell script from terminal using
    ```bash
    ./startApp.sh
@@ -35,17 +86,15 @@ There are two ways to use this application
 ### Windows
 
 - Please follow steps to install docker desktop for you operating system [here](https://www.docker.com/get-started/)
-- Once you have docker desktop installed on your system download and extract [release v1.1.0](https://github.com/aakarshanbasubhardwaj/timeSeriesDataSynchronisation/releases/download/v1.0.0/v1.0.0.zip)
+- Once you have docker desktop installed on your system download and extract [release v1.1.0](https://github.com/aakarshanbasubhardwaj/timeSeriesDataSynchronisation/releases/tag/v1.1.0)
 - Double click the startApp.bat file 
 - Visit [localhost:8080/](localhost:8080/) to start using the app.
-
-## Python GUI
 
 ## Usage
 
 Once the tool is set up and installed the following workflow can be used to synchronize two streams of 3d accelerometer data.
 
-- Access the frontend at [localhost:8080/](localhost:8080/)
+- Access the frontend at [localhost:8080/](localhost:8080/) when running via Docker, or at or [localhost:8051/](localhost:8051/) when using the Python GUI.
 - Drag and drop or click to upload files to be synchronized.
    - Only csv files can be uploaded for synchronization.
    - The files each must have 3 columns each with the first, second and third column corresponding to the x, y and z axis readings of the accelerometer respectively.
