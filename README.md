@@ -7,7 +7,7 @@ There are two ways to use this application
 ### Linux distros
 
 - Please follow steps to install docker engine for you operating system [here](https://docs.docker.com/engine/install/)
-- Once you have docker engine installed on your system download and extract [release]()
+- Once you have docker engine installed on your system download and extract [release v1.0.0](https://github.com/aakarshanbasubhardwaj/timeSeriesDataSynchronisation/releases/download/v1.0.0/v1.0.0.zip)
 - Run the startApp shell script 
    ```bash
    ./startApp.sh
@@ -21,7 +21,7 @@ There are two ways to use this application
 ### Mac OS
 
 - Please follow steps to install docker desktop for you operating system [here](https://www.docker.com/get-started/)
-- Once you have docker desktop installed on your system download and extract [release]()
+- Once you have docker desktop installed on your system download and extract [release v1.0.0](https://github.com/aakarshanbasubhardwaj/timeSeriesDataSynchronisation/releases/download/v1.0.0/v1.0.0.zip)
 - Run the startApp shell script 
    ```bash
    ./startApp.sh
@@ -35,7 +35,7 @@ There are two ways to use this application
 ### Windows
 
 - Please follow steps to install docker desktop for you operating system [here](https://www.docker.com/get-started/)
-- Once you have docker desktop installed on your system download and extract [release]()
+- Once you have docker desktop installed on your system download and extract [release v1.0.0](https://github.com/aakarshanbasubhardwaj/timeSeriesDataSynchronisation/releases/download/v1.0.0/v1.0.0.zip)
 - Run the startApp shell script 
    ```bash
    ./startApp.sh
