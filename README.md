@@ -7,8 +7,8 @@ There are two ways to use this application
 ### Linux distros
 
 - Please follow steps to install docker engine for you operating system [here](https://docs.docker.com/engine/install/)
-- Once you have docker engine installed on your system download and extract [release v1.0.0](https://github.com/aakarshanbasubhardwaj/timeSeriesDataSynchronisation/releases/download/v1.0.0/v1.0.0.zip)
-- Run the startApp shell script 
+- Once you have docker engine installed on your system download and extract [release v1.1.0](https://github.com/aakarshanbasubhardwaj/timeSeriesDataSynchronisation/releases/download/v1.0.0/v1.0.0.zip)
+- Run the startApp shell script from terminal using
    ```bash
    ./startApp.sh
    ```
@@ -21,8 +21,8 @@ There are two ways to use this application
 ### Mac OS
 
 - Please follow steps to install docker desktop for you operating system [here](https://www.docker.com/get-started/)
-- Once you have docker desktop installed on your system download and extract [release v1.0.0](https://github.com/aakarshanbasubhardwaj/timeSeriesDataSynchronisation/releases/download/v1.0.0/v1.0.0.zip)
-- Run the startApp shell script 
+- Once you have docker desktop installed on your system download and extract [release v1.1.0](https://github.com/aakarshanbasubhardwaj/timeSeriesDataSynchronisation/releases/download/v1.0.0/v1.0.0.zip)
+- Run the startApp shell script from terminal using
    ```bash
    ./startApp.sh
    ```
@@ -35,15 +35,8 @@ There are two ways to use this application
 ### Windows
 
 - Please follow steps to install docker desktop for you operating system [here](https://www.docker.com/get-started/)
-- Once you have docker desktop installed on your system download and extract [release v1.0.0](https://github.com/aakarshanbasubhardwaj/timeSeriesDataSynchronisation/releases/download/v1.0.0/v1.0.0.zip)
-- Run the startApp shell script 
-   ```bash
-   ./startApp.sh
-   ```
-   - If the script does not run try again after making the script executable using 
-      ```bash
-      chmod +x startApp.sh
-      ```
+- Once you have docker desktop installed on your system download and extract [release v1.1.0](https://github.com/aakarshanbasubhardwaj/timeSeriesDataSynchronisation/releases/download/v1.0.0/v1.0.0.zip)
+- Double click the startApp.bat file 
 - Visit [localhost:8080/](localhost:8080/) to start using the app.
 
 ## Python GUI
