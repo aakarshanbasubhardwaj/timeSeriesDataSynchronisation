@@ -46,6 +46,22 @@ There are two ways to use this application
       ```
 - Visit [localhost:8080/](localhost:8080/) to start using the app.
 
+## Python GUI
+
+## Usage
+
+Once the tool is set up and installed the following workflow can be used to synchronize two streams of 3d accelerometer data.
+
+- Access the frontend at [localhost:8080/](localhost:8080/)
+- Drag and drop or click to upload files to be synchronized.
+   - Only csv files can be uploaded for synchronization.
+   - The files each must have 3 columns each with the first, second and third column corresponding to the x, y and z axis readings of the accelerometer respectively.
+   - The total file size of the files must not exceed 50 MB.
+- A graph showing the plots of the uploaded files will be rendered below.
+- Click the Sync button to synchronize the files.
+- Upon completion the files will be available for download as a zip.
+- The synchronized files are also visualized in the frontend.
+
 # Local Development
 
 1. **Clone the repository**
