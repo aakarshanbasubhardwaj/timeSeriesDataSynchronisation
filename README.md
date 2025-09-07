@@ -9,7 +9,7 @@ There are two ways to use this application
 
 1. Make sure Python is installed on your system. 
 
-2. After installing Python, download and extract [release v1.1.0](https://github.com/aakarshanbasubhardwaj/timeSeriesDataSynchronisation/releases/tag/v1.1.0) - v1.1.0.tar.gz
+2. After installing Python, download and extract [release v1.1.0](https://github.com/aakarshanbasubhardwaj/timeSeriesDataSynchronisation/releases/download/v1.1.0/v1.1.0.tar.gz) - v1.1.0.tar.gz
 
 3. Navigate to *PythonGUI* directory in the extracted release folder
 ```bash
@@ -32,7 +32,7 @@ cd PythonGUI
 
 1. Make sure Python is installed on your system. 
 
-2. After installing Python, download and extract [release v1.1.0](https://github.com/aakarshanbasubhardwaj/timeSeriesDataSynchronisation/releases/tag/v1.1.0) - v1.1.0.tar.gz
+2. After installing Python, download and extract [release v1.1.0](https://github.com/aakarshanbasubhardwaj/timeSeriesDataSynchronisation/releases/download/v1.1.0/v1.1.0.tar.gz) - v1.1.0.tar.gz
 
 3. Navigate to *PythonGUI* directory in the extracted release folder
 ```bash
@@ -55,7 +55,7 @@ cd PythonGUI
 
 1. Make sure Python and GCC (C compiler) are installed on your system. 
 
-2. After installing both, download and extract [release v1.1.0](https://github.com/aakarshanbasubhardwaj/timeSeriesDataSynchronisation/releases/tag/v1.1.0) - v1.1.0.tar.gz
+2. After installing both, download and extract [release v1.1.0](https://github.com/aakarshanbasubhardwaj/timeSeriesDataSynchronisation/releases/download/v1.1.0/v1.1.0.tar.gz) - v1.1.0.tar.gz
 
 3. You can start the app by navigating to *PythonGUI* folder in the extracted release folder
 
@@ -71,7 +71,7 @@ cd PythonGUI
 
    - If the post install instructions are not followed, the shell script must be executed using *sudo*.
 
-2. Once you have docker engine installed on your system download and extract [release v1.1.0](https://github.com/aakarshanbasubhardwaj/timeSeriesDataSynchronisation/releases/tag/v1.1.0)
+2. Once you have docker engine installed on your system download and extract [release v1.1.0](https://github.com/aakarshanbasubhardwaj/timeSeriesDataSynchronisation/releases/download/v1.1.0/v1.1.0.tar.gz)
 
 3. Navigate to *Docker* directory in the extracted release folder
 ```bash
@@ -94,7 +94,7 @@ cd Docker
 
 1. Please follow steps to install docker desktop for you operating system [here](https://www.docker.com/get-started/)
 
-2. Once you have docker desktop installed on your system download and extract [release v1.1.0](https://github.com/aakarshanbasubhardwaj/timeSeriesDataSynchronisation/releases/tag/v1.1.0)
+2. Once you have docker desktop installed on your system download and extract [release v1.1.0](https://github.com/aakarshanbasubhardwaj/timeSeriesDataSynchronisation/releases/download/v1.1.0/v1.1.0.tar.gz)
 
 3. Navigate to *Docker* directory in the extracted release folder
 ```bash
@@ -117,7 +117,7 @@ cd Docker
 
 1. Please follow steps to install docker desktop for your operating system [here](https://www.docker.com/get-started/)
 
-2. Once you have docker desktop installed on your system, download and extract [release v1.1.0](https://github.com/aakarshanbasubhardwaj/timeSeriesDataSynchronisation/releases/tag/v1.1.0)
+2. Once you have docker desktop installed on your system, download and extract [release v1.1.0](https://github.com/aakarshanbasubhardwaj/timeSeriesDataSynchronisation/releases/download/v1.1.0/v1.1.0.tar.gz)
 
 3. You can start the app by navigating to *Docker* folder in the extracted release folder
 
