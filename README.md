@@ -71,34 +71,33 @@ experiment/
 ```bash
 jupyter notebook
 ```
-- Navigate to the folder location created in step 1 and open the experiment.ipynb file in jupyter notebook.
+- Open the experiment.ipynb file in jupyter notebook.
 - Run the code using the run button.
-- This will start executing the experiment and generate detailed reports in a .csv file named ```dtw_results.csv```.
--Open the graph.ipynb file in jupyter notebook and run the code to visualise the results.
+- This will start executing the experiment and generate detailed reports in a .csv file named ```dtw_results.csv``` and ```unsync_report.csv```.
+- Open the graph.ipynb file in jupyter notebook and run the code to visualise the results.
 - Upon experiment completion graphs will be generated and saved in the location ```graphs```.
 
-# What happens in the experiment
+## What happens in the experiment
 The experiment when run does the following per subject -
 - Magnitude Calculation per subject
 - Variance Calculation per subject using the magnitudes from the last step
 - Labelling of rest and motion segments in the data stream. This is done by making use of variance calculated in the last step.
-- Generation of balanced windows by looking up the labels. The windows have a rest and motion segments in the ratio of 1:1.
+- Generation of high variance windows by looking up the labels. The windows have a rest and motion segments in the ratio of 1:1.
 - The generated windows are used to look up in the target stream to find the best match.
 - To find the best match in the target stream -
-  - Calculation of the search space in the target stream with 10 seconds worth of data on both sides of the balanced window.
+  - Calculation of the search space in the target stream with 10 seconds worth of data on both sides of the high variance window.
   - DTW matching between the balanced window and the selected candidate window in the target stream.
 - The step for finding the best match for each balanced window is executed in parallel with max available workers on the machine.
 
-## Artifacts explanation
-TODO add screenshots of the reports and graphs generated and explain the grpah as well
+## Artifacts
 The experiment generates a .csv report containing details about 
 - how much unsynchronisation was introduced in each limb of each subject
 - the lead/lag among the limbs of each subject
 
-The experiment generates the following artifacts per subject -
-- Four .csv reports (one each for comparing right arm with left arm, left arm with right arm, right leg with left leg and left leg with right leg) for each subject containing the following details
-  - balanced window start and end index in the data stream
+It also generates the following report -
+- A .csv report with details of all modes(comparing right arm with left arm, left arm with right arm, right leg with left leg and left leg with right leg) for each subject containing the following details
+  - High Variance Window start and end index in the data stream
   - best matching window start and end index in the target stream
-  - plot name for the balanced window and best matching window
+  - DTW distance of the match
 
-Aditionally the four box plots also generated to show the degree of correctness of synchronisation achieved
+Aditionally the four box plots and bar charts are generated to show the degree of correctness of synchronisation achieved
