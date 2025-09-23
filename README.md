@@ -76,6 +76,7 @@ jupyter notebook
 - This will start executing the experiment and generate detailed reports in a .csv file named ```dtw_results.csv``` and ```unsync_report.csv```.
 - Open the graph.ipynb file in jupyter notebook and run the code to visualise the results.
 - Upon experiment completion graphs will be generated and saved in the location ```graphs```.
+- If you wish to run the experiment for 1:2 and 2:1 Rest : Motion High Variance Windows, then in the sync function use get_balanced_windows_by_ratio function instead of get_balanced_windows and set the target ratio as 1/3 for 1:2 window and 2/3 for 2:1 window in the function parameter.
 
 ## What happens in the experiment
 The experiment when run does the following per subject -
